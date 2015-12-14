@@ -1,0 +1,59 @@
+file_path = "distribute.sh"
+
+if File.exist?(file_path)
+  File.delete(file_path)
+end
+
+distribute_file = File.new(file_path, 'w')
+
+distribute_file.puts '''
+#!/bin/bash
+
+PRODUCT_PATH="./Product/"
+APPLE_ID="%s"
+
+config="Release"
+
+while getopts "c:w:s:" arg
+do
+        case $arg in
+            c)
+                config=$OPTARG
+                ;;
+            w)
+                workspace_dir=$OPTARG
+                ;;
+            s)
+                scheme=$OPTARG
+                ;;
+            ?)
+                echo "unknow argument"
+        exit 1
+        ;;
+        esac
+done
+
+if [ ! -d "$PRODUCT_PATH" ];then
+    mkdir "$PRODUCT_PATH"
+fi
+
+build_file_name=${config}".ipa"
+build_arg="-c "${config}" -d "${PRODUCT_PATH}" --ipa="${build_file_name}
+
+if [ -n "$workspace_dir" ];then
+    build_arg=${build_arg}" -w "${workspace_dir}
+fi
+
+if [ -n "$scheme" ];then
+    build_arg=${build_arg}" -s "${scheme}
+fi
+
+distribute_ic_arg="-i "${APPLE_ID}" -f "${PRODUCT_PATH}${build_file_name}" --save-keychain --upload"
+
+rm ${PRODUCT_PATH}${build_file_name}
+
+ipa build $build_arg
+ipa distribute:itunesconnect $distribute_ic_arg
+''' % ARGV[0]
+
+distribute_file.close

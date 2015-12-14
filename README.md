@@ -1,2 +1,4 @@
-# ipa-auto-distribute
-a ipa auto distibute shell script based on Shenzhen repo
+# IPA Auto Distribute
+A auto distribute ipa shell script based on Shenzhen repo
+
+###Usage
